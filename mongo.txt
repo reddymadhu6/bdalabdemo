@@ -1,0 +1,69 @@
+db.createCollection("students", {
+   validator: {
+      $jsonSchema: {
+         bsonType: "object",
+         required: ["student_id", "name", "age", "address"]
+      }
+   }
+})
+db.students.insertMany([
+   {
+      student_id: 1,
+      name: "John Doe",
+      age: 20,
+      grades: [
+         { subject: "Math", score: 85 },
+         { subject: "Science", score: 90 },
+         { subject: "History", score: 75 }
+      ],
+      address: "123 Main St"
+   },
+   {
+      student_id: 2,
+      name: "Jane Smith",
+      age: 22,
+      grades: [
+         { subject: "Math", score: 95 },
+         { subject: "Science", score: 88 },
+         { subject: "History", score: 82 }
+      ],
+      address: "456 Elm St"
+   },
+   {
+      student_id: 3,
+      name: "Alice Johnson",
+      age: 21,
+      grades: [
+         { subject: "Math", score: 78 },
+         { subject: "Science", score: 80 },
+         { subject: "History", score: 70 }
+      ],
+      address: "789 Oak St"
+   },
+   {
+      student_id: 4,
+      name: "Bob Williams",
+      age: 23,
+      grades: [
+         { subject: "Math", score: 88 },
+         { subject: "Science", score: 92 },
+         { subject: "History", score: 85 }
+      ],
+      address: "101 Pine St"
+   },
+   {
+      student_id: 5,
+      name: "Eva Brown",
+      age: 19,
+      grades: [
+         { subject: "Math", score: 90 },
+         { subject: "Science", score: 85 },
+         { subject: "History", score: 80 }
+      ],
+      address: "111 Cedar St"
+   }
+])
+db.students.aggregate([{$unwind:"$grades"},{$group:{_id:"$grades.subject",averageScore:{$avg:"$grades.score"}}}])
+db.students.aggregate([{$unwind:"$grades"},{$group:{_id:"$_id",name:{$first:"$name"},address:{$first:"$address"},averageScore:{$avg:"$grades.score"}}},{$sort:{averageScore:-1}},{$limit:1}])
+db.students.drop()
+
